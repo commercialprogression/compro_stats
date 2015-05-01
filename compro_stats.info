@@ -1,0 +1,9 @@
+name = Compro Stats and Graphs
+description = Blocks of Google Analytics Reports and other charts
+core = 7.x
+package = Features
+version = 7.x-0.1
+project = compro_stats
+dependencies[] = google_analytics_api
+dependencies[] = charts
+dependencies[] = charts_google

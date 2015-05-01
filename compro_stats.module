@@ -1,0 +1,100 @@
+<?php
+/**
+ * @file
+ * Code for the Compro Stats and Graphs feature.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function compro_stats_menu() {
+  $items = array();
+
+  $items['admin/config/system/compro-stats'] = array(
+    'title' => 'Compro Stats',
+    'file' => 'compro_stats.admin.inc',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('compro_stats_admin_settings'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function compro_stats_block_info() {
+  $blocks = array();
+
+  $block_list = _compro_stats_get_blocks();
+  foreach ($block_list as $delta => $name) {
+    if (_compro_stats_block_is_enabled($delta)) {
+      $blocks[$delta] = array(
+        'info' => $name,
+      );
+    }
+  }
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function compro_stats_block_view($delta = '') {
+  module_load_include('inc', 'compro_stats', 'compro_stats.blocks');
+  $block = array();
+
+  if (_compro_stats_block_is_enabled($delta)) {
+    switch ($delta) {
+      case 'compro_stats_site_visits':
+        $block['subject'] = '';
+        $block['content'] = _compro_stats_site_visits();
+        break;
+      case 'compro_stats_site_usage':
+        $block['subject'] = '';
+        $block['content'] = _compro_stats_site_usage();
+        break;
+      case 'compro_stats_top_pages':
+        $block['subject'] = '';
+        $block['content'] = _compro_stats_top_pages();
+        break;
+      case 'compro_stats_top_referrals':
+        $block['subject'] = '';
+        $block['content'] = _compro_stats_top_referrals();
+        break;
+      case 'compro_stats_browsers':
+        $block['subject'] = '';
+        $block['content'] = _compro_stats_browsers();
+        break;
+    }
+  }
+
+  return $block;
+}
+
+/**
+ * Returns a list of compro stats blocks.
+ */
+function _compro_stats_get_blocks($enabled_blocks_only = TRUE) {
+  return array(
+    'compro_stats_site_visits' => t('Site Visits Over the Past Week'),
+    'compro_stats_site_usage' => t('Site Usage Over the Past Week'),
+    'compro_stats_top_pages' => t('Top Pages Over the Past Week'),
+    'compro_stats_top_referrals' => t('Top Referrals Over the Past Week'),
+    'compro_stats_browsers' => t('Browser Usage Over the Past Week'),
+  );
+}
+
+/**
+ * Verify if a given block is enabled in the compro stats admin settings.
+ */
+function _compro_stats_block_is_enabled($delta) {
+  $blocks = variable_get('compro_stats_blocks', array());
+  if (!empty($blocks[$delta])) {
+    return TRUE;
+  }
+  return FALSE;
+}
