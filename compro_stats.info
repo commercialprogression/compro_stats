@@ -4,6 +4,6 @@ core = 7.x
 package = Features
 version = 7.x-0.1
 project = compro_stats
-dependencies[] = google_analytics_api
+dependencies[] = google_analytics_reports_api
 dependencies[] = charts
 dependencies[] = charts_google

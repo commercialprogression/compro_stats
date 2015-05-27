@@ -11,13 +11,13 @@
 function _compro_stats_site_visits() {
   chart_get_library('google');
   $params = array(
-    'metrics' => array('ga:visits'),
+    'metrics' => array('ga:sessions'),
     'dimensions' => array('ga:date'),
     'sort_metric' => array('ga:date'),
     'start_date' => strtotime('-8 days'),
     'end_date' => strtotime('-1 day'),
   );
-  $feed = google_analytics_api_report_data($params);
+  $feed = google_analytics_reports_api_report_data($params);
   if ($feed->error) {
     if ($feed->error == 'Code: 401 - Error: Unauthorized - Message: GDatarequiredAuthorizationLogin Required') {
       return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports') .
@@ -27,9 +27,9 @@ function _compro_stats_site_visits() {
   }
   $max_visits = 0;
   $data = array();
-  foreach ($feed->results as $row) {
-    $data[] = $row['visits'];
-    $max_visits = max($row['visits'], $max_visits);
+  foreach ($feed->results->rows as $row) {
+    $data[] = (int) $row['sessions'];
+    $max_visits = max($row['sessions'], $max_visits);
   }
   $chart = array(
     '#title' => '',
@@ -43,10 +43,10 @@ function _compro_stats_site_visits() {
     '#title' => t('Sessions'),
     '#data' => $data,
   );
-  $last_day = end($feed->results);
+  $last_day = end($feed->results->rows);
   $title = t('The most visits on a single day was @max.  Yesterday there were @yesterday visits.', array(
     '@max' => $max_visits,
-    '@yesterday' => $last_day['visits']
+    '@yesterday' => $last_day['sessions']
   ));
   $chart['#attributes'] = array(
     'title' => $title,
@@ -64,17 +64,17 @@ function _compro_stats_site_usage() {
   chart_get_library('google');
   $params = array(
     'metrics' => array(
-      'ga:visits',
+      'ga:sessions',
       'ga:bounces',
       'ga:entrances',
       'ga:pageviews',
-      'ga:timeOnSite',
-      'ga:newVisits'
+      'ga:sessionDuration',
+      'ga:newUsers',
     ),
     'start_date' => strtotime('-8 days'),
     'end_date' => strtotime('-1 day'),
   );
-  $feed = google_analytics_api_report_data($params);
+  $feed = google_analytics_reports_api_report_data($params);
   if ($feed->error) {
     if ($feed->error == 'Code: 401 - Error: Unauthorized - Message: GDatarequiredAuthorizationLogin Required') {
       return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports') .
@@ -83,17 +83,17 @@ function _compro_stats_site_usage() {
     return FALSE;
   }
 
-  $results = $feed->results[0];
+  $results = $feed->results->rows[0];
 
-  if ($results['visits'] <= 0) {
+  if ($results['sessions'] <= 0) {
     $results['pages_per_visit'] = '0.00';
     $results['new_visits'] = '0.00%';
     $results['time_on_site'] = '0:00';
   }
   else {
-    $results['pages_per_visit'] = number_format(round($results['pageviews'] / $results['visits'], 2), 2);
-    $results['new_visits'] = number_format(round(($results['newVisits'] / $results['visits']) * 100, 2), 2) . '%';
-    $results['time_on_site'] = format_interval($results['timeOnSite'] / $results['visits']);
+    $results['pages_per_visit'] = number_format(round($results['pageviews'] / $results['sessions'], 2), 2);
+    $results['new_visits'] = number_format(round(($results['newUsers'] / $results['sessions']) * 100, 2), 2) . '%';
+    $results['time_on_site'] = format_interval($results['sessionDuration'] / $results['sessions']);
   }
 
   if ($results['entrances'] <= 0) {
@@ -105,21 +105,11 @@ function _compro_stats_site_usage() {
 
   $results['entrances'] = number_format($results['entrances']);
   $results['pageviews'] = number_format($results['pageviews']);
-
+  
   $data = array(
-    array('Visits', $results['entrances'], 'Bounce Rate', $results['bounces']),
-    array(
-      'Page Views',
-      $results['pageviews'],
-      'Avg. Time on Site',
-      $results['time_on_site']
-    ),
-    array(
-      'Pages/Visit',
-      $results['pages_per_visit'],
-      'New Visits',
-      $results['new_visits']
-    )
+    array('Sessions', $results['entrances'], 'Bounce Rate', $results['bounces']),
+    array('Page Views', $results['pageviews'], 'Avg. Time on Site', $results['time_on_site']),
+    array('Pages/Visit', $results['pages_per_visit'], 'New Visits', $results['new_visits'])
   );
   return theme('table', array('rows' => $data));
 }
@@ -139,7 +129,7 @@ function _compro_stats_top_pages() {
     'sort' => '-ga:pageviews',
     'max_results' => 5,
   );
-  $feed = google_analytics_api_report_data($params);
+  $feed = google_analytics_reports_api_report_data($params);
   if ($feed->error) {
     if ($feed->error == 'Code: 401 - Error: Unauthorized - Message: GDatarequiredAuthorizationLogin Required') {
       return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports') .
@@ -157,7 +147,7 @@ function _compro_stats_top_pages() {
   );
   $pageviews = array();
   $pages = array();
-  foreach ($feed->results as $page) {
+  foreach ($feed->results->rows as $page) {
     $pages[] = $page['pageTitle'];
     $pageviews[] = (int) number_format($page['pageviews']);
   }
@@ -184,15 +174,15 @@ function _compro_stats_top_pages() {
 function _compro_stats_top_referrals() {
   chart_get_library('google');
   $params = array(
-    'metrics' => array('ga:visits'),
+    'metrics' => array('ga:sessions'),
     'dimensions' => array('ga:source', 'ga:medium'),
-    'sort_metric' => array('-ga:visits'),
+    'sort_metric' => array('-ga:sessions'),
     'filters' => 'ga:medium==referral',
     'start_date' => strtotime('-8 days'),
     'end_date' => strtotime('-1 day'),
     'max_results' => 5,
   );
-  $feed = google_analytics_api_report_data($params);
+  $feed = google_analytics_reports_api_report_data($params);
   if ($feed->error) {
     if ($feed->error == 'Code: 401 - Error: Unauthorized - Message: GDatarequiredAuthorizationLogin Required') {
       return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports') .
@@ -210,9 +200,9 @@ function _compro_stats_top_referrals() {
   );
   $pageviews = array();
   $referrers = array();
-  foreach ($feed->results as $page) {
+  foreach ($feed->results->rows as $page) {
     $referrers[] = $page['source'];
-    $pageviews[] = (int) number_format($page['visits']);
+    $pageviews[] = (int) number_format($page['sessions']);
   }
   $chart['views'] = array(
     '#type' => 'chart_data',
@@ -243,7 +233,7 @@ function _compro_stats_browsers() {
     'start_date' => strtotime('-8 days'),
     'end_date' => strtotime('-1 day'),
   );
-  $feed = google_analytics_api_report_data($params);
+  $feed = google_analytics_reports_api_report_data($params);
   if ($feed->error) {
     if ($feed->error == 'Code: 401 - Error: Unauthorized - Message: GDatarequiredAuthorizationLogin Required') {
       return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports') .
@@ -261,7 +251,7 @@ function _compro_stats_browsers() {
   );
   $sessions = array();
   $browsers = array();
-  foreach ($feed->results as $page) {
+  foreach ($feed->results->rows as $page) {
     $browsers[] = $page['browser'];
     $sessions[] = (int) number_format($page['sessions']);
   }
