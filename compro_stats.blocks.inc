@@ -18,9 +18,9 @@ function _compro_stats_site_visits() {
     'end_date' => strtotime('-1 day'),
   );
   $feed = google_analytics_reports_api_report_data($params);
-  if ($feed->error) {
-    if ($feed->error == 'Code: 401 - Error: Unauthorized - Message: GDatarequiredAuthorizationLogin Required') {
-      return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports') .
+  if ($feed->response->error) {
+    if ($feed->response->error == 'Unauthorized') {
+      return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports-api') .
              t(' page and setup GA access to view this chart');
     }
     return FALSE;
@@ -75,9 +75,9 @@ function _compro_stats_site_usage() {
     'end_date' => strtotime('-1 day'),
   );
   $feed = google_analytics_reports_api_report_data($params);
-  if ($feed->error) {
-    if ($feed->error == 'Code: 401 - Error: Unauthorized - Message: GDatarequiredAuthorizationLogin Required') {
-      return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports') .
+  if ($feed->response->error) {
+    if ($feed->response->error == 'Unauthorized') {
+      return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports-api') .
              t(' page and setup GA access to view this chart');
     }
     return FALSE;
@@ -130,9 +130,9 @@ function _compro_stats_top_pages() {
     'max_results' => 5,
   );
   $feed = google_analytics_reports_api_report_data($params);
-  if ($feed->error) {
-    if ($feed->error == 'Code: 401 - Error: Unauthorized - Message: GDatarequiredAuthorizationLogin Required') {
-      return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports') .
+  if ($feed->response->error) {
+    if ($feed->response->error == 'Unauthorized') {
+      return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports-api') .
              t(' page and setup GA access to view this chart');
     }
     return FALSE;
@@ -183,9 +183,9 @@ function _compro_stats_top_referrals() {
     'max_results' => 5,
   );
   $feed = google_analytics_reports_api_report_data($params);
-  if ($feed->error) {
-    if ($feed->error == 'Code: 401 - Error: Unauthorized - Message: GDatarequiredAuthorizationLogin Required') {
-      return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports') .
+  if ($feed->response->error) {
+    if ($feed->response->error == 'Unauthorized') {
+      return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports-api') .
              t(' page and setup GA access to view this chart');
     }
     return FALSE;
@@ -234,9 +234,9 @@ function _compro_stats_browsers() {
     'end_date' => strtotime('-1 day'),
   );
   $feed = google_analytics_reports_api_report_data($params);
-  if ($feed->error) {
-    if ($feed->error == 'Code: 401 - Error: Unauthorized - Message: GDatarequiredAuthorizationLogin Required') {
-      return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports') .
+  if ($feed->response->error) {
+    if ($feed->response->error == 'Unauthorized') {
+      return t('Please go to the ') . l(t('Google Analytics Report'), 'admin/config/system/google-analytics-reports-api') .
              t(' page and setup GA access to view this chart');
     }
     return FALSE;
