@@ -14,7 +14,7 @@ function compro_stats_admin_settings() {
   $form['compro_stats_blocks'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Make the following blocks available'),
-    '#options' => _compro_stats_get_blocks(FALSE),
+    '#options' => _compro_stats_get_blocks(),
     '#default_value' => variable_get('compro_stats_blocks', array()),
     '#description' => t('These blocks will be made available in places
       such as the blocks admin interface and the homebox layout.'),

@@ -1,22 +1,25 @@
 <?php
+
 /**
  * @file
  * Install/uninstall functions for the Compro Stats module.
  */
 
+/**
+ * Implements hook_install().
+ */
 function compro_stats_install() {
-  // Enable all blocks immediately
+  // Enable all blocks immediately.
   $compro_stats = array();
-  $blocks = array_keys(_compro_stats_get_blocks(FALSE));
+  $blocks = array_keys(_compro_stats_get_blocks());
   foreach ($blocks as $block) {
     $compro_stats[$block] = $block;
   }
 
   variable_set('compro_stats_blocks', $compro_stats);
 
-  // Enable google_analytics_api, but leave out the icky reports module
-  module_enable(array('google_analytics_reports_api'));
-  module_disable(array('google_analytics_reports'));
+  // Enable google_analytics_api, but leave out the icky reports module.
+  module_enable(array('google_analytics_reports'));
 }
 
 /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Code for the Compro Stats and Graphs feature.
@@ -53,22 +54,27 @@ function compro_stats_block_view($delta = '') {
         $block['subject'] = '';
         $block['content'] = _compro_stats_site_visits();
         break;
+
       case 'compro_stats_site_usage':
         $block['subject'] = '';
         $block['content'] = _compro_stats_site_usage();
         break;
+
       case 'compro_stats_top_pages':
         $block['subject'] = '';
         $block['content'] = _compro_stats_top_pages();
         break;
+
       case 'compro_stats_top_referrals':
         $block['subject'] = '';
         $block['content'] = _compro_stats_top_referrals();
         break;
+
       case 'compro_stats_browsers':
         $block['subject'] = '';
         $block['content'] = _compro_stats_browsers();
         break;
+
     }
   }
 
@@ -77,8 +83,11 @@ function compro_stats_block_view($delta = '') {
 
 /**
  * Returns a list of compro stats blocks.
+ *
+ * @return array
+ *   A list of the blocks in an array.
  */
-function _compro_stats_get_blocks($enabled_blocks_only = TRUE) {
+function _compro_stats_get_blocks() {
   return array(
     'compro_stats_site_visits' => t('Site Visits Over the Past Week'),
     'compro_stats_site_usage' => t('Site Usage Over the Past Week'),
@@ -90,6 +99,12 @@ function _compro_stats_get_blocks($enabled_blocks_only = TRUE) {
 
 /**
  * Verify if a given block is enabled in the compro stats admin settings.
+ *
+ * @param string $delta
+ *   Pass in the block's delta.
+ *
+ * @return bool
+ *   Return TRUE if enabled, FALSE otherwise.
  */
 function _compro_stats_block_is_enabled($delta) {
   $blocks = variable_get('compro_stats_blocks', array());
